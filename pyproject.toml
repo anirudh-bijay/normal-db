@@ -1,0 +1,7 @@
+[project]
+name = "normaldb"
+authors = [
+  { name = "Anirudh Cheriyachanaseri Bijay", email = "anirudhcb23@iitk.ac.in" },
+]
+readme = "README.md"
+dynamic = ["version"]
