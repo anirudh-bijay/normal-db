@@ -1,7 +1,10 @@
 [project]
-name = "normaldb"
-authors = [
-  { name = "Anirudh Cheriyachanaseri Bijay", email = "anirudhcb23@iitk.ac.in" },
-]
-readme = "README.md"
-dynamic = ["version"]
+  name = "normaldb"
+  authors = [
+    { name = "Anirudh Cheriyachanaseri Bijay", email = "anirudhcb23@iitk.ac.in" },
+  ]
+  readme = "README.md"
+  dynamic = ["version"]
+
+[tool.black]
+  line-length = 80
