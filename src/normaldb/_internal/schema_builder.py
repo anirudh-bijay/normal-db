@@ -64,7 +64,7 @@ class SchemaBuilder:
             if not any(existing_key < key for existing_key in self.keys):
                 self.keys.add(key)
 
-        # O(n) time complexity for n sets (across the domains and codomains of
+        # O(n) time complexity for n fields (across the domains and codomains of
         # all FDs).
         for lhs, rhs in functional_deps:
             lhs_set = frozenset(lhs)
