@@ -47,11 +47,14 @@ class SchemaBuilder:
 
         self.attributes = set(attributes)
         self.keys: set[frozenset[Hashable]] = set()
-        self.functional_deps: set[tuple[frozenset[Hashable], frozenset[Hashable]]] = (
-            set()
-        )
+        self.functional_deps: set[
+            tuple[frozenset[Hashable], frozenset[Hashable]]
+        ] = set()
 
-        for key in sorted((frozenset(key) for key in keys), key=lambda k: len(k)):
+        # O(n²) time complexity for n keys.
+        for key in sorted(
+            (frozenset(key) for key in keys), key=lambda k: len(k)
+        ):
             if not key <= self.attributes:
                 raise ValueError(
                     f"Key {key} has attributes that are not in the schema."
@@ -61,6 +64,8 @@ class SchemaBuilder:
             if not any(existing_key < key for existing_key in self.keys):
                 self.keys.add(key)
 
+        # O(n) time complexity for n sets (across the domains and codomains of
+        # all FDs).
         for lhs, rhs in functional_deps:
             lhs_set = frozenset(lhs)
             rhs_set = frozenset(rhs)
