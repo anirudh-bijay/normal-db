@@ -1,10 +1,16 @@
+[build-system]
+  requires      = ["setuptools"]
+  build-backend = "setuptools.build_meta"
+
 [project]
   name = "normaldb"
   authors = [
     { name = "Anirudh Cheriyachanaseri Bijay", email = "anirudhcb23@iitk.ac.in" },
+    { name = "Vinay Chavan", email = "vinay23@iitk.ac.in" },
   ]
   readme = "README.md"
   dynamic = ["version"]
+  optional-dependencies = { "gui" = ["flask"] }
 
 [tool.black]
   line-length = 80
