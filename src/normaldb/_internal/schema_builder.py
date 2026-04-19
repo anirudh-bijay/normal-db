@@ -156,7 +156,7 @@ class SchemaBuilder:
 
                 new_fds.setdefault(frozenset(new_lhs), set[int]()).add(rhs_attr)
 
-        del new_fds[frozenset()]
+        new_fds.pop(frozenset(), None)
         self.functional_deps = new_fds
 
     def find_covering(self) -> None:
