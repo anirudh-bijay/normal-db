@@ -1,9 +1,5 @@
-from flask import Flask, render_template, request, url_for
-
-import normaldb
-
-# TODO: Create a frontend that allows users to interact with the
-#       normaldb package.
+from normaldb import SchemaBuilder
+from flask import Flask, render_template, request, url_for, jsonify
 
 app = Flask(__name__)
 
@@ -15,18 +11,81 @@ def index():
 
 @app.route("/normalize", methods=["POST"])
 def normalize():
-    # TODO: Integrate the app with the functionalities of normal-db
     try:
         data = request.get_json(silent=True)
-        print(data)
+        print("Received data:", data)
+
         if data is None:
-            return {"error": "No JSON body received."}, 400
-        return {"received": data}
+            return (
+                jsonify({"success": False, "error": "No JSON body received."}),
+                400,
+            )
+
+        attributes = set(data["attributes"])
+        keys = [set(key) for key in data["keys"]]
+        functional_deps = [
+            (set(lhs), set(rhs)) for lhs, rhs in data["functional_deps"]
+        ]
+
+        print(f"Attributes: {attributes}")
+        print(f"Keys: {keys}")
+        print(f"FDs: {functional_deps}")
+
+        schema_builder = SchemaBuilder(
+            attributes=attributes, keys=keys, functional_deps=functional_deps
+        )
+        result = schema_builder.synthesised_schema()
+
+        print("Result from SchemaBuilder:", result)
+
+        # Convert result to JSON-serializable format
+        if result:
+            relations = [
+                {
+                    "name": f"R{i+1}",
+                    "attributes": (
+                        list(relation)
+                        if hasattr(relation, "__iter__")
+                        else [relation]
+                    ),
+                }
+                for i, relation in enumerate(result)
+            ]
+            return jsonify(
+                {
+                    "success": True,
+                    "relations": relations,
+                    "summary": (
+                        f"Schema successfully decomposed into {len(relations)} "
+                        f"relations in 3NF",
+                    ),
+                }
+            )
+        else:
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": (
+                            "Decomposition returned empty result. Check your "
+                            "input."
+                        ),
+                    }
+                ),
+                400,
+            )
+
     except Exception as error:
         print("Normalization error:", error)
-        return {"error": "Failed to parse request."}, 500
+        import traceback
 
-
-def create_app():
-    app = Flask(__name__)
-    return app
+        traceback.print_exc()
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": f"Normalization failed: {str(error)}",
+                }
+            ),
+            500,
+        )
