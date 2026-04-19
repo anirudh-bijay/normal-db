@@ -174,7 +174,7 @@ class SchemaBuilder:
 
         new_fds = self.functional_deps.copy()
         for lhs, rhs in self.functional_deps.items():
-            for rhs_attr in rhs:
+            for rhs_attr in rhs.copy():
                 # Checking FD of the form lhs → {rhs_attr}.
                 new_fds[lhs].remove(rhs_attr)
                 if not new_fds[lhs]:
