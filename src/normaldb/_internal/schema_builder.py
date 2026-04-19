@@ -251,6 +251,32 @@ class SchemaBuilder:
                     self.fd_groups[i].extend(self.fd_groups[j])
                     if j != i:
                         del self.fd_groups[j]
+        
+    def eliminate_transitive_dependencies(self):
+        """
+        Eliminates transitive dependencies.
+        Finds a minimal subset H' of the FD's such that (H' U J)+ = (H U J)+
+        i.e. no proper subset of H' has this property
+        
+        dependency in the schema. An attribute *A* ∈ *X* is extraneous in an FD
+        For each FD X->Y , check if the X->A is implied by the rest FD's, where A ∈ Y
+        """
+        new_fds = self.functional_deps.copy()
+        for lhs, rhs in list(self.functional_deps.items()):
+            for rhs_attr in list(rhs):
+                # Temporarily remove 
+                new_fds[lhs].remove(rhs_attr)
+                if not new_fds[lhs]:
+                    del new_fds[lhs]
+                
+                # check if the FD is implied by remaining FD's
+                if self.in_closure((lhs, rhs_attr), new_fds):
+                    # FD is transitive/redundant, so let it be removed
+                    pass
+                else:
+                    new_fds.setdefault(lhs, set()).add(rhs_attr)
+        self.functional_deps = new_fds
+            
 
     @overload
     @staticmethod
