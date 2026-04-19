@@ -1,4 +1,5 @@
 let fds = [];
+let candidate_keys = [];
 let editingIndex = -1; // Track which FD is being edited
 
 function addFD() {
@@ -30,6 +31,42 @@ function addFD() {
     leftInput.value = '';
     rightInput.value = '';
     updateNormalizeButton();
+}
+
+function addCandidateKey(){
+    const keyInput = document.querySelector(".key");
+    const keyValue = keyInput.value.trim();
+
+    if(!keyValue){
+        showNotification("Please give the candidate keys", 'error');
+        return;
+    }
+
+    candidate_keys.push(keyValue.split(",").map(key => key.trim()).filter(Boolean));
+    renderKeys();
+    keyInput.value = '';
+    updateNormalizeButton();
+}
+
+function renderKeys(){
+    const container = document.querySelector(".key-container");
+
+    container.innerHTML = candidate_keys.map((key, index) => `
+        <div class="key-tag" data-index="${index}">
+            <span class="key-display">${key.join(', ')}</span>
+            <button class="btn-remove-tag" onclick="removeKey(${index})" title="Delete Key">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+function removeKey(index) {
+    if (confirm(`Remove key: ${candidate_keys[index].join(', ')}?`)) {
+        candidate_keys.splice(index, 1);
+        renderKeys();
+        updateNormalizeButton();
+    }
 }
 
 function editFD(index) {
@@ -97,14 +134,16 @@ function renderFDs() {
 function updateNormalizeButton() {
     const btn = document.getElementById('normalizeBtn');
     const attributes = document.getElementById('attributes').value.trim();
-    const hasData = fds.length > 0 && attributes;
+
+    const hasData = fds.length > 0 && attributes && candidate_keys.length > 0;
     btn.disabled = !hasData;
-    btn.textContent = hasData ? 'Normalize to 3NF' : 'Add FDs first';
+    btn.textContent = hasData ? 'Normalize to 3NF' : 'Add FDs and keys first';
 }
 
 function clearAll() {
     if (confirm('Clear all data?')) {
         fds = [];
+        candidate_keys = [];  // Add this line to clear keys
         editingIndex = -1;
         document.getElementById('attributes').value = '';
         document.querySelector('.fd-left').value = '';
@@ -112,6 +151,7 @@ function clearAll() {
         document.querySelector('.btn-add-fd').innerHTML = '<i class="fas fa-plus"></i>';
         document.querySelector('.btn-add-fd').onclick = addFD;
         renderFDs();
+        renderKeys();  // Add this line to re-render empty keys
         updateNormalizeButton();
         showResults([]);
     }
@@ -132,8 +172,10 @@ function showNotification(message, type = 'success') {
 async function normalizeDB() {
     const btn = document.getElementById('normalizeBtn');
     const resultsContainer = document.getElementById('results-container');
-    // alert("Will Integrate this with the normal-db soon..:)")
-    // return;
+    const attributes = document.getElementById('attributes').value
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
 
     btn.disabled = true;
     resultsContainer.innerHTML = `
@@ -142,7 +184,7 @@ async function normalizeDB() {
             <p>Computing 3NF decomposition...</p>
         </div>
     `;
-    alert("Will be available after integration with normal-db :)")
+
     try {
         const response = await fetch('/normalize', {
             method: 'POST',
@@ -150,12 +192,17 @@ async function normalizeDB() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                attributes: document.getElementById('attributes').value.trim(),
-                fds: fds
+                attributes,
+                keys: candidate_keys,
+                functional_deps: fds.map(fd => [
+                    fd.left.split(',').map(s => s.trim()).filter(Boolean),
+                    fd.right.split(',').map(s => s.trim()).filter(Boolean)
+                ])
             })
         });
         
         const data = await response.json();
+        console.log(data);
         
         if (data.success) {
             showResults(data.relations, data.summary);

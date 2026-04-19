@@ -42,6 +42,25 @@
                     <small>Enter all attributes of your relation</small>
                 </div>
 
+                <div class="input-group">
+                    <label for="keys">
+                        <i class="fas fa-list"></i> Keys (comma-separated)
+                    </label>
+                    <div class="fd-row" role="group" aria-label="Add Candidate Keys">
+                        <input type="text" 
+                                class="key" 
+                                placeholder="A, B" 
+                                autocomplete="off"
+                                aria-label="Candidate Keys">
+                        <button class="btn-add-key" id="addKeyBtn" onclick="addCandidateKey()" aria-label="Add Candidate Keys">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="key-container">
+                        <!-- Keys will be rendered here -->
+                    </div>
+                </div>
+
                 <!-- FD Input -->
                 <div class="input-group">
                     <label>Functional Dependencies</label>
