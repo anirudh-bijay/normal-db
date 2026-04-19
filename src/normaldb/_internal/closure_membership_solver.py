@@ -78,6 +78,8 @@ class ClosureMembershipSolver:
 
         while newdepend:
             next_to_check = newdepend.pop()
+            if next_to_check >= len(self.attrlist):
+                continue
             for i in self.attrlist[next_to_check]:
                 counter[i] -= 1
                 if counter[i] == 0:
