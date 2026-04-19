@@ -2,6 +2,20 @@ from collections.abc import Iterable, Hashable
 
 
 class SchemaBuilder:
+    """
+    Builder for a 3NF database schema. The schema is created from a set of
+    attributes, a set of candidate keys, and a set of functional dependencies.
+
+    Algorithm 2 from [1] is used to synthesise the schema.
+
+    References
+    ----------
+    1. Philip A. Bernstein. “Synthesizing third normal form relations from
+       functional dependencies”. In: _ACM Trans. Database Syst._ 1.4 (Dec.
+       1976), pp. 277-298. ISSN: 0362-5915.
+       doi: [10.1145/320493.320489](https://doi.org/10.1145/320493.320489).
+    """
+
     def __init__(
         self,
         attributes: Iterable[Hashable] = set(),
