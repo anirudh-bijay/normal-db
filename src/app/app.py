@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-
 from normaldb import SchemaBuilder
 from flask import Flask, render_template, request, url_for, jsonify
-
-# TODO: Create a frontend that allows users to interact with the
-#       normaldb package.
 
 app = Flask(__name__)
 
