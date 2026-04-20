@@ -276,6 +276,30 @@ class SchemaBuilder:
                 else:
                     new_fds.setdefault(lhs, set()).add(rhs_attr)
         self.functional_deps = new_fds
+    
+    def construct_relations(self) -> None:
+        """
+        Step 6: Construct relations from FD groups.
+        Each group becomes a relation containing all attributes in that group.
+        The LHSs are keys of the relation.
+        """
+        self.relations = []
+
+        for group in self.fd_groups.values():
+            # Collect all attributes in this group
+            attrs = set()
+            keys = []
+            for lhs in group:
+                attrs |= set(lhs)
+                attrs |= self.functional_deps.get(lhs, set())
+                # record the key 
+                keys.append({self.attributes[i] for i in lhs})
+
+            # remove duplicate keys
+            keys = [list(k) for k in {frozenset(k) for k in keys}]
+            # Map indices back to attribute names
+            relation = {self.attributes[i] for i in attrs}
+            self.relations.append({"relation": relation, "keys": keys})
             
 
     @overload

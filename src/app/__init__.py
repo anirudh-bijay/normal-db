@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("./index.html")
+    return render_template("index.html")
 
 
 @app.route("/normalize", methods=["POST"])
@@ -40,17 +40,20 @@ def normalize():
 
         # Convert result to JSON-serializable format
         if result:
-            relations = [
-                {
+            relations = []
+            for i, relation in enumerate(result):
+                rel_attrs = relation.get("relation", relation)
+                rel_keys = relation.get("keys", [])
+                
+                relations.append({
                     "name": f"R{i+1}",
                     "attributes": (
-                        list(relation)
-                        if hasattr(relation, "__iter__")
-                        else [relation]
+                        list(rel_attrs)
+                        if hasattr(rel_attrs, "__iter__")
+                        else [rel_attrs]
                     ),
-                }
-                for i, relation in enumerate(result)
-            ]
+                    "keys": [list(k) for k in rel_keys]
+                })
             return jsonify(
                 {
                     "success": True,

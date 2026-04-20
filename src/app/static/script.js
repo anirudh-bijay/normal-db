@@ -205,7 +205,7 @@ async function normalizeDB() {
         console.log(data);
         
         if (data.success) {
-            showResults(data.relations, data.summary);
+            showResults(data?.relations, data.summary);
             showNotification('Normalization successful!', 'success');
         } else {
             resultsContainer.innerHTML = `
@@ -254,7 +254,17 @@ function showResults(relations, summary) {
                     <div class="relation-name">R${index + 1}</div>
                     <div class="relation-count">${relation.attributes?.length || 0} attrs</div>
                 </div>
-                <div class="relation-attributes">${Array.isArray(relation.attributes) ? relation.attributes.join(', ') : 'No attributes'}</div>
+                
+                <div class="relation-attributes">
+                    <strong>Attributes:</strong> ${Array.isArray(relation.attributes) ? relation.attributes.join(', ') : 'No attributes'}
+                </div>
+                <div class="relation-keys">
+                    <strong>Keys:</strong> ${
+                        Array.isArray(relation.keys) 
+                        ? relation.keys.map(k => `<u>{${k.join(', ')}}</u>`).join(' , ') 
+                        : 'No keys'
+                    }
+                </div>
             </div>
         `).join('')}
     `;
