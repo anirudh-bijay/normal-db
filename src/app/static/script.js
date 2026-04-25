@@ -129,24 +129,25 @@ function renderFDs() {
 
 function updateNormalizeButton() {
     const btn = document.getElementById('normalizeBtn');
-    const attributes = document.getElementById('attributes').value.trim();
+    // const attributes = document.getElementById('attributes').value.trim();
 
-    const hasData = fds.length >= 0 && attributes && candidate_keys.length >= 0;
+    const hasData = fds.length > 0;
+    // const hasData = fds.length >= 0 && attributes && candidate_keys.length >= 0;
     btn.disabled = !hasData;
     btn.textContent = hasData ? 'Normalize to 3NF' : 'Enter Details';
 }
 
 function clearAll() {
     fds = [];
-    candidate_keys = [];  // Add this line to clear keys
+    // candidate_keys = [];  // Add this line to clear keys
     editingIndex = -1;
-    document.getElementById('attributes').value = '';
+    // document.getElementById('attributes').value = '';
     document.querySelector('.fd-left').value = '';
     document.querySelector('.fd-right').value = '';
     document.querySelector('.btn-add-fd').innerHTML = '<i class="fas fa-plus"></i>';
     document.querySelector('.btn-add-fd').onclick = addFD;
     renderFDs();
-    renderKeys();  // Add this line to re-render empty keys
+    // renderKeys();  // Add this line to re-render empty keys
     updateNormalizeButton();
     showResults([]);
 }
@@ -166,10 +167,13 @@ function showNotification(message, type = 'success') {
 async function normalizeDB() {
     const btn = document.getElementById('normalizeBtn');
     const resultsContainer = document.getElementById('results-container');
-    const attributes = document.getElementById('attributes').value
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean);
+    let attributes = new Set();
+    fds.forEach(fd => {
+        fd.left.split(',').map(s => s.trim()).filter(Boolean).forEach(a => attributes.add(a));
+        fd.right.split(',').map(s => s.trim()).filter(Boolean).forEach(a => attributes.add(a));
+    });
+
+    attributes = Array.from(attributes);
 
     btn.disabled = true;
     resultsContainer.innerHTML = `
