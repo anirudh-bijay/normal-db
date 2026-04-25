@@ -320,6 +320,18 @@ class SchemaBuilder:
                 self.relations.append(
                     {"relation": key_attrs, "keys": [list(key_attrs)]}
                 )
+        
+        # remove redundant relations
+        # Step 6: eliminate redundant relations (subset check)
+        cleaned_relations = []
+        for i, rel in enumerate(self.relations):
+            if not any(
+                rel["relation"] < other["relation"]  # strict subset
+                for j, other in enumerate(self.relations) if i != j
+            ):
+                cleaned_relations.append(rel)
+        self.relations = cleaned_relations
+
 
     @overload
     @staticmethod
