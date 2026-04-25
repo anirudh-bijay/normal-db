@@ -131,9 +131,9 @@ function updateNormalizeButton() {
     const btn = document.getElementById('normalizeBtn');
     const attributes = document.getElementById('attributes').value.trim();
 
-    const hasData = fds.length > 0 && attributes && candidate_keys.length > 0;
+    const hasData = fds.length >= 0 && attributes && candidate_keys.length >= 0;
     btn.disabled = !hasData;
-    btn.textContent = hasData ? 'Normalize to 3NF' : 'Add FDs and keys first';
+    btn.textContent = hasData ? 'Normalize to 3NF' : 'Enter Details';
 }
 
 function clearAll() {
