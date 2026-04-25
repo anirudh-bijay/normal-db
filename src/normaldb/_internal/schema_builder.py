@@ -21,11 +21,11 @@ class SchemaBuilder:
 
     def __init__(
         self,
-        attributes: Iterable[Hashable] = set(),
-        keys: Iterable[Iterable[Hashable]] = set(),
+        attributes: Iterable[Hashable],
+        keys: Iterable[Iterable[Hashable]],
         functional_deps: Iterable[
             tuple[Iterable[Hashable], Iterable[Hashable]]
-        ] = set(),
+        ],
     ):
         """
         Initialise the schema builder with the given attributes and
@@ -238,7 +238,7 @@ class SchemaBuilder:
             self.functional_deps[lhs] -= rhs
 
         # Clean up.
-        for lhs, rhs in self.functional_deps.items():
+        for lhs, rhs in self.functional_deps.copy().items():
             if not rhs:
                 del self.functional_deps[lhs]
 
@@ -251,24 +251,24 @@ class SchemaBuilder:
                     self.fd_groups[i].extend(self.fd_groups[j])
                     if j != i:
                         del self.fd_groups[j]
-        
+
     def eliminate_transitive_dependencies(self):
         """
         Eliminates transitive dependencies.
         Finds a minimal subset H' of the FD's such that (H' U J)+ = (H U J)+
         i.e. no proper subset of H' has this property
-        
+
         dependency in the schema. An attribute *A* ∈ *X* is extraneous in an FD
         For each FD X->Y , check if the X->A is implied by the rest FD's, where A ∈ Y
         """
         new_fds = self.functional_deps.copy()
         for lhs, rhs in list(self.functional_deps.items()):
             for rhs_attr in list(rhs):
-                # Temporarily remove 
+                # Temporarily remove
                 new_fds[lhs].remove(rhs_attr)
                 if not new_fds[lhs]:
                     del new_fds[lhs]
-                
+
                 # check if the FD is implied by remaining FD's
                 if self.in_closure((lhs, rhs_attr), new_fds):
                     # FD is transitive/redundant, so let it be removed
@@ -276,7 +276,7 @@ class SchemaBuilder:
                 else:
                     new_fds.setdefault(lhs, set()).add(rhs_attr)
         self.functional_deps = new_fds
-    
+
     def construct_relations(self) -> None:
         """
         Step 6: Construct relations from FD groups.
@@ -292,7 +292,7 @@ class SchemaBuilder:
             for lhs in group:
                 attrs |= set(lhs)
                 attrs |= self.functional_deps.get(lhs, set())
-                # record the key 
+                # record the key
                 keys.append({self.attributes[i] for i in lhs})
 
             # remove duplicate keys
@@ -300,15 +300,16 @@ class SchemaBuilder:
             # Map indices back to attribute names
             relation = {self.attributes[i] for i in attrs}
             self.relations.append({"relation": relation, "keys": keys})
-        
+
         # ensure that the candidate key relation is present
         # for each candidate key, check if it is containes in some relation
         for key in self.keys:
             key_attrs = {self.attributes[i] for i in key}
-            if not any(key_attrs <= rel['relation'] for rel in self.relations):
+            if not any(key_attrs <= rel["relation"] for rel in self.relations):
                 # add the missing candidate key relation
-                self.relations.append({"relation": key_attrs, "keys": [list(key_attrs)]})
-            
+                self.relations.append(
+                    {"relation": key_attrs, "keys": [list(key_attrs)]}
+                )
 
     @overload
     @staticmethod
