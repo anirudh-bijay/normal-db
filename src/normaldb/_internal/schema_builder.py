@@ -300,6 +300,14 @@ class SchemaBuilder:
             # Map indices back to attribute names
             relation = {self.attributes[i] for i in attrs}
             self.relations.append({"relation": relation, "keys": keys})
+        
+        # ensure that the candidate key relation is present
+        # for each candidate key, check if it is containes in some relation
+        for key in self.keys:
+            key_attrs = {self.attributes[i] for i in key}
+            if not any(key_attrs <= rel['relation'] for rel in self.relations):
+                # add the missing candidate key relation
+                self.relations.append({"relation": key_attrs, "keys": [list(key_attrs)]})
             
 
     @overload

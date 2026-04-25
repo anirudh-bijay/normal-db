@@ -205,7 +205,7 @@ async function normalizeDB() {
         console.log(data);
         
         if (data.success) {
-            showResults(data?.relations, data.summary);
+            showResults(data?.relations, data.summary, data.sql);
             showNotification('Normalization successful!', 'success');
         } else {
             resultsContainer.innerHTML = `
@@ -232,7 +232,8 @@ async function normalizeDB() {
     }
 }
 
-function showResults(relations, summary) {
+function showResults(relations, summary, sql) {
+    console.log(sql)
     const container = document.getElementById('results-container');
     
     if (!relations || relations.length === 0) {
@@ -267,6 +268,10 @@ function showResults(relations, summary) {
                 </div>
             </div>
         `).join('')}
+        <div class="sql-section">
+            <h3><i class="fas fa-code"></i> Generated SQL</h3>
+            <pre class="sql-box">${sql}</pre>
+        </div>
     `;
 }
 

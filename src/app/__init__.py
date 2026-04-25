@@ -1,4 +1,4 @@
-from normaldb import SchemaBuilder
+from normaldb import SchemaBuilder, SQLGenerator
 from flask import Flask, render_template, request, url_for, jsonify
 
 app = Flask(__name__)
@@ -54,10 +54,13 @@ def normalize():
                     ),
                     "keys": [list(k) for k in rel_keys]
                 })
+                
+                sql_gen = SQLGenerator(relations)
             return jsonify(
                 {
                     "success": True,
                     "relations": relations,
+                    "sql": sql_gen.generate(),
                     "summary": (
                         f"Schema successfully decomposed into {len(relations)} "
                         f"relations in 3NF",
