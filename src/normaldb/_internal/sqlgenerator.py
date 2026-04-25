@@ -42,11 +42,11 @@ class SQLGenerator:
             
             # primary key
             pk = relation['keys'][0]
-            sql_stmt += f"  PRIMARY KEY ({', '.join(pk)})"
+            sql_stmt += f"  PRIMARY KEY ({', '.join(pk)}),"
             
             if len(relation['keys']) > 1:
                 for i in range(1, len(relation['keys'])):
-                    sql_stmt += f"\n  UNIQUE({', '.join(relation['keys'][i])})"
+                    sql_stmt += f"\n  UNIQUE({', '.join(relation['keys'][i])}),"
             
             # foreign keys
             for attr in relation['attributes']:
@@ -57,6 +57,6 @@ class SQLGenerator:
             sql_statements.append(sql_stmt)
         
         # return the joined string
-        print(sql_statements)
+        # print(sql_statements)
         return "\n\n".join(sql_statements)
         
