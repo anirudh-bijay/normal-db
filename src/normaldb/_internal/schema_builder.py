@@ -301,6 +301,16 @@ class SchemaBuilder:
             relation = {self.attributes[i] for i in attrs}
             self.relations.append({"relation": relation, "keys": keys})
 
+        # ensure that any remaining attributes that are not the part of any schema are put together in another relation
+        all_rel_attrs = set().union(
+            *(rel["relation"] for rel in self.relations)
+        )
+        missing_attrs = set(self.attributes) - all_rel_attrs
+        if missing_attrs:
+            self.relations.append(
+                {"relation": missing_attrs, "keys": [list(missing_attrs)]}
+            )
+
         # ensure that the candidate key relation is present
         # for each candidate key, check if it is containes in some relation
         for key in self.keys:

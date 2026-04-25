@@ -62,11 +62,9 @@ function renderKeys(){
 }
 
 function removeKey(index) {
-    if (confirm(`Remove key: ${candidate_keys[index].join(', ')}?`)) {
-        candidate_keys.splice(index, 1);
-        renderKeys();
-        updateNormalizeButton();
-    }
+    candidate_keys.splice(index, 1);
+    renderKeys();
+    updateNormalizeButton();
 }
 
 function editFD(index) {
@@ -92,11 +90,9 @@ function editFD(index) {
 }
 
 function removeFD(index) {
-    if (confirm(`Remove FD: ${fds[index].left} → ${fds[index].right}?`)) {
-        fds.splice(index, 1);
-        renderFDs();
-        updateNormalizeButton();
-    }
+    fds.splice(index, 1);
+    renderFDs();
+    updateNormalizeButton();
 }
 
 function renderFDs() {
@@ -135,26 +131,24 @@ function updateNormalizeButton() {
     const btn = document.getElementById('normalizeBtn');
     const attributes = document.getElementById('attributes').value.trim();
 
-    const hasData = fds.length > 0 && attributes && candidate_keys.length > 0;
+    const hasData = fds.length >= 0 && attributes && candidate_keys.length >= 0;
     btn.disabled = !hasData;
-    btn.textContent = hasData ? 'Normalize to 3NF' : 'Add FDs and keys first';
+    btn.textContent = hasData ? 'Normalize to 3NF' : 'Enter Details';
 }
 
 function clearAll() {
-    if (confirm('Clear all data?')) {
-        fds = [];
-        candidate_keys = [];  // Add this line to clear keys
-        editingIndex = -1;
-        document.getElementById('attributes').value = '';
-        document.querySelector('.fd-left').value = '';
-        document.querySelector('.fd-right').value = '';
-        document.querySelector('.btn-add-fd').innerHTML = '<i class="fas fa-plus"></i>';
-        document.querySelector('.btn-add-fd').onclick = addFD;
-        renderFDs();
-        renderKeys();  // Add this line to re-render empty keys
-        updateNormalizeButton();
-        showResults([]);
-    }
+    fds = [];
+    candidate_keys = [];  // Add this line to clear keys
+    editingIndex = -1;
+    document.getElementById('attributes').value = '';
+    document.querySelector('.fd-left').value = '';
+    document.querySelector('.fd-right').value = '';
+    document.querySelector('.btn-add-fd').innerHTML = '<i class="fas fa-plus"></i>';
+    document.querySelector('.btn-add-fd').onclick = addFD;
+    renderFDs();
+    renderKeys();  // Add this line to re-render empty keys
+    updateNormalizeButton();
+    showResults([]);
 }
 
 function showNotification(message, type = 'success') {
