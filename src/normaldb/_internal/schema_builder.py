@@ -205,12 +205,19 @@ class SchemaBuilder:
             i: [lhs] for i, (lhs, _) in enumerate(self.functional_deps.items())
         }
 
+        # Required later in ``eliminate_transitive_dependencies``.
+        self.inv_fd_groups = {lhs: i for i, [lhs] in self.fd_groups.items()}
+
     def merge_equivalent_keys(self) -> None:
         """
         Merge FDs with equivalent LHSs. Two FDs *X* → *A* and *Y* → *B* are said
         to have equivalent LHSs if *X* → *Y* and *Y* → *X* are in the closure of
         the set of FDs, _i.e._, if the bijection *X* ↔ *Y* exists in the
         closure.
+
+        At the end of this step, we have a partition of the FDs into groups of
+        FDs with equivalent LHSs in ``self.fd_groups``. The FDs constituting
+        the bijections are removed from ``self.functional_deps``.
         """
 
         self.equiv_keys = dict[frozenset[int], set[int]]()
@@ -243,83 +250,109 @@ class SchemaBuilder:
                 del self.functional_deps[lhs]
 
         # Update the FD groups to reflect the mergers.
+        self.merged_groups = dict[int, int]()
+
         visited = list(False for _ in range(len(self.fd_groups)))
         for i, group in enumerate(new_groups):
             if not visited[i]:
                 for j in group:
                     visited[j] = True
                     self.fd_groups[i].extend(self.fd_groups[j])
+                    self.merged_groups[j] = i
                     if j != i:
                         del self.fd_groups[j]
 
     def eliminate_transitive_dependencies(self):
         """
-        Eliminates transitive dependencies.
-        Finds a minimal subset H' of the FD's such that (H' U J)+ = (H U J)+
-        i.e. no proper subset of H' has this property
-
-        dependency in the schema. An attribute *A* ∈ *X* is extraneous in an FD
-        For each FD X->Y , check if the X->A is implied by the rest FD's, where A ∈ Y
+        Find a minimal subset of the FDs left in ``self.functional_deps`` after
+        ``merge_equivalent_keys`` that covers the same closure as
+        the original set of FDs.
         """
+
         new_fds = self.functional_deps.copy()
-        for lhs, rhs in list(self.functional_deps.items()):
-            for rhs_attr in list(rhs):
-                # Temporarily remove
+        for lhs, rhs in self.functional_deps.items():
+            for rhs_attr in rhs.copy():
+                # Checking FD of the form lhs → {rhs_attr}.
                 new_fds[lhs].remove(rhs_attr)
                 if not new_fds[lhs]:
                     del new_fds[lhs]
-
-                # check if the FD is implied by remaining FD's
-                if self.in_closure((lhs, rhs_attr), new_fds):
-                    # FD is transitive/redundant, so let it be removed
+                if self.in_closure((lhs, rhs_attr), new_fds | self.equiv_keys):
+                    # FD is transitive/redundant, let it stay removed.
                     pass
                 else:
                     new_fds.setdefault(lhs, set()).add(rhs_attr)
+
         self.functional_deps = new_fds
 
+        # # Add each bijection back into its corresponding (merged) group of FDs.
+        # for i in self.fd_groups:
+        #     self.fd_groups[i] = [
+        #         lhs
+        #         for lhs in set(self.fd_groups[i])
+        #         if lhs in self.functional_deps
+        #     ]
+
+        # for i in self.equiv_keys:
+        #     self.fd_groups[self.merged_groups[self.inv_fd_groups[i]]].append(i)
+
+        for lhs, rhs in self.equiv_keys.items():
+            for rhs_attr in rhs:
+                self.functional_deps.setdefault(lhs, set()).add(rhs_attr)
+
+        # Cleanup.
+        for i in self.fd_groups.copy():
+            # Stage 1: Remove any empty groups of FDs.
+            if not self.fd_groups[i]:
+                del self.fd_groups[i]
+            else:
+                # Stage 2: Remove repeated LHSs.
+                self.fd_groups[i] = list(frozenset(self.fd_groups[i]))
+                # Stage 2: Remove any FDs with empty right-hand sides.
+                for lhs in self.fd_groups[i].copy():
+                    if not self.functional_deps.get(lhs, set()):
+                        self.fd_groups[i].remove(lhs)
+
     def construct_relations(self) -> None:
-        """
-        Step 6: Construct relations from FD groups.
-        Each group becomes a relation containing all attributes in that group.
-        The LHSs are keys of the relation.
-        """
+        """Construct relations from the groups of FDs identified."""
+
         self.relations = []
 
         for group in self.fd_groups.values():
-            # Collect all attributes in this group
+            # Collect all attributes in this group.
             attrs = set()
             keys = []
             for lhs in group:
                 attrs |= set(lhs)
-                attrs |= self.functional_deps.get(lhs, set())
-                # record the key
+                attrs |= self.functional_deps[lhs]
+                # Collect keys.
                 keys.append({self.attributes[i] for i in lhs})
 
-            # remove duplicate keys
+            # Remove duplicate keys.
             keys = [list(k) for k in {frozenset(k) for k in keys}]
-            # Map indices back to attribute names
+            # Map indices back to attribute names.
             relation = {self.attributes[i] for i in attrs}
             self.relations.append({"relation": relation, "keys": keys})
 
-        # ensure that any remaining attributes that are not the part of any schema are put together in another relation
-        all_rel_attrs = set().union(
-            *(rel["relation"] for rel in self.relations)
-        )
-        missing_attrs = set(self.attributes) - all_rel_attrs
-        if missing_attrs:
-            self.relations.append(
-                {"relation": missing_attrs, "keys": [list(missing_attrs)]}
-            )
+        # # Ensure that any remaining attributes that are not the part of any
+        # # schema are put together in another relation.
+        # all_rel_attrs = set().union(
+        #     *(rel["relation"] for rel in self.relations)
+        # )
+        # missing_attrs = set(self.attributes) - all_rel_attrs
+        # if missing_attrs:
+        #     self.relations.append(
+        #         {"relation": missing_attrs, "keys": [list(missing_attrs)]}
+        #     )
 
-        # ensure that the candidate key relation is present
-        # for each candidate key, check if it is containes in some relation
-        for key in self.keys:
-            key_attrs = {self.attributes[i] for i in key}
-            if not any(key_attrs <= rel["relation"] for rel in self.relations):
-                # add the missing candidate key relation
-                self.relations.append(
-                    {"relation": key_attrs, "keys": [list(key_attrs)]}
-                )
+        # # ensure that the candidate key relation is present
+        # # for each candidate key, check if it is containes in some relation
+        # for key in self.keys:
+        #     key_attrs = {self.attributes[i] for i in key}
+        #     if not any(key_attrs <= rel["relation"] for rel in self.relations):
+        #         # add the missing candidate key relation
+        #         self.relations.append(
+        #             {"relation": key_attrs, "keys": [list(key_attrs)]}
+        #         )
 
     @overload
     @staticmethod
