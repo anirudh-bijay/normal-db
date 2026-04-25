@@ -37,7 +37,7 @@ class SQLGenerator:
             # print(self.relations)
             # columns of table
             for attr in relation['attributes']:
-                data_type = self.data_type_map.get(attr, "VARCHAR(100)")
+                data_type = self.data_type_map.get(attr, "[data-type]")
                 sql_stmt += f"  {attr} {data_type}, \n"
             
             # primary key

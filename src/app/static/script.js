@@ -270,6 +270,7 @@ function showResults(relations, summary, sql) {
         `).join('')}
         <div class="sql-section">
             <h3><i class="fas fa-code"></i> Generated SQL</h3>
+            <p> Further Edit SQL code as per the need...</p>
             <pre class="sql-box">${sql}</pre>
         </div>
     `;
