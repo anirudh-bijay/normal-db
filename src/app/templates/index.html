@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3NF Normalization Tool - normal-db</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="header-text">
+                    <h1>3NF Normalization App</h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Input Panel -->
+            <section class="panel input-panel" role="main">
+                <h2 class="panel-title">
+                    <i class="fas fa-edit"></i> 
+                    Define Relation
+                </h2>
+
+                <!-- Attributes Input -->
+                <!-- <div class="input-group">
+                    <label for="attributes">
+                        <i class="fas fa-list"></i> Attributes (comma-separated)
+                    </label>
+                    <input type="text" 
+                           id="attributes" 
+                           placeholder="A, B, C, D, E" 
+                           autocomplete="off">
+                    <small>Enter all attributes of your relation</small>
+                </div> -->
+
+                <!-- <div class="input-group">
+                    <label for="keys">
+                        <i class="fas fa-list"></i> Keys (comma-separated)
+                    </label>
+                    <div class="fd-row" role="group" aria-label="Add Candidate Keys">
+                        <input type="text" 
+                                class="key" 
+                                placeholder="A, B" 
+                                autocomplete="off"
+                                aria-label="Candidate Keys">
+                        <button class="btn-add-key" id="addKeyBtn" onclick="addCandidateKey()" aria-label="Add Candidate Keys">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="key-container">
+
+                    </div>
+                </div> -->
+
+                <!-- FD Input -->
+                <div class="input-group">
+                    <label>Functional Dependencies</label>
+                    <div class="fd-input-group">
+                        <div class="fd-row" role="group" aria-label="Add Functional Dependency">
+                            <input type="text" 
+                                   class="fd-left" 
+                                   placeholder="A, B" 
+                                   autocomplete="off"
+                                   aria-label="Left side attributes">
+                            <span class="fd-arrow" aria-hidden="true">→</span>
+                            <input type="text" 
+                                   class="fd-right" 
+                                   placeholder="C" 
+                                   autocomplete="off"
+                                   aria-label="Right side attributes">
+                            <button class="btn-add-fd" id="addFdBtn" onclick="addFD()" aria-label="Add FD">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="fds-container" id="fds-container" role="list">
+                        <!-- FDs will be rendered here by JavaScript -->
+                    </div>
+                    <small class="fd-hint">
+                        <i class="fas fa-info-circle"></i> 
+                        Click ✏️ to edit or 🗑️ to delete FDs
+                    </small>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" id="normalizeBtn" onclick="normalizeDB()" disabled>
+                        <i class="fas fa-bolt"></i>
+                        <span>Add FDs first</span>
+                    </button>
+                    <button class="btn-secondary" onclick="clearAll()">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                </div>
+
+                <div class="stats" id="stats">
+                    <span class="stat">
+                        <i class="fas fa-list"></i> 
+                        <span id="attr-count">5</span> attrs
+                    </span>
+                    <span class="stat">
+                        <i class="fas fa-exchange-alt"></i> 
+                        <span id="fd-count">0</span> FDs
+                    </span>
+                </div>
+            </section>
+
+            <!-- Results Panel -->
+            <section class="panel results-panel">
+                <h2 class="panel-title">
+                    <i class="fas fa-table"></i> 
+                    3NF Decomposition Results
+                </h2>
+                <div id="results-container" class="results-container" role="region" aria-live="polite">
+                    <div class="empty-state large">
+                        <div class="empty-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h3>Ready to normalize</h3>
+                        <p>Define your attributes and functional dependencies, then click "Normalize to 3NF"</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
