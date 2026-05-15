@@ -1,5 +1,6 @@
+from flask import Flask, jsonify, render_template, request, url_for
+
 from normaldb import SchemaBuilder, SQLGenerator
-from flask import Flask, render_template, request, url_for, jsonify
 
 app = Flask(__name__)
 
@@ -44,17 +45,19 @@ def normalize():
             for i, relation in enumerate(result):
                 rel_attrs = relation.get("relation", relation)
                 rel_keys = relation.get("keys", [])
-                
-                relations.append({
-                    "name": f"R{i+1}",
-                    "attributes": (
-                        list(rel_attrs)
-                        if hasattr(rel_attrs, "__iter__")
-                        else [rel_attrs]
-                    ),
-                    "keys": [list(k) for k in rel_keys]
-                })
-                
+
+                relations.append(
+                    {
+                        "name": f"R{i+1}",
+                        "attributes": (
+                            list(rel_attrs)
+                            if hasattr(rel_attrs, "__iter__")
+                            else [rel_attrs]
+                        ),
+                        "keys": [list(k) for k in rel_keys],
+                    }
+                )
+
                 sql_gen = SQLGenerator(relations)
             return jsonify(
                 {

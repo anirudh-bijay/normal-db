@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <header class="header">
@@ -25,7 +27,7 @@
             <!-- Input Panel -->
             <section class="panel input-panel" role="main">
                 <h2 class="panel-title">
-                    <i class="fas fa-edit"></i> 
+                    <i class="fas fa-edit"></i>
                     Define Relation
                 </h2>
 
@@ -65,17 +67,11 @@
                     <label>Functional Dependencies</label>
                     <div class="fd-input-group">
                         <div class="fd-row" role="group" aria-label="Add Functional Dependency">
-                            <input type="text" 
-                                   class="fd-left" 
-                                   placeholder="A, B" 
-                                   autocomplete="off"
-                                   aria-label="Left side attributes">
+                            <input type="text" class="fd-left" placeholder="A, B" autocomplete="off"
+                                aria-label="Left side attributes">
                             <span class="fd-arrow" aria-hidden="true">→</span>
-                            <input type="text" 
-                                   class="fd-right" 
-                                   placeholder="C" 
-                                   autocomplete="off"
-                                   aria-label="Right side attributes">
+                            <input type="text" class="fd-right" placeholder="C" autocomplete="off"
+                                aria-label="Right side attributes">
                             <button class="btn-add-fd" id="addFdBtn" onclick="addFD()" aria-label="Add FD">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -85,7 +81,7 @@
                         <!-- FDs will be rendered here by JavaScript -->
                     </div>
                     <small class="fd-hint">
-                        <i class="fas fa-info-circle"></i> 
+                        <i class="fas fa-info-circle"></i>
                         Click ✏️ to edit or 🗑️ to delete FDs
                     </small>
                 </div>
@@ -102,11 +98,11 @@
 
                 <div class="stats" id="stats">
                     <span class="stat">
-                        <i class="fas fa-list"></i> 
+                        <i class="fas fa-list"></i>
                         <span id="attr-count">5</span> attrs
                     </span>
                     <span class="stat">
-                        <i class="fas fa-exchange-alt"></i> 
+                        <i class="fas fa-exchange-alt"></i>
                         <span id="fd-count">0</span> FDs
                     </span>
                 </div>
@@ -115,7 +111,7 @@
             <!-- Results Panel -->
             <section class="panel results-panel">
                 <h2 class="panel-title">
-                    <i class="fas fa-table"></i> 
+                    <i class="fas fa-table"></i>
                     3NF Decomposition Results
                 </h2>
                 <div id="results-container" class="results-container" role="region" aria-live="polite">
@@ -133,4 +129,5 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
