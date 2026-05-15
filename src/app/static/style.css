@@ -178,6 +178,7 @@ body {
 }
 
 .btn-remove-tag {
+    margin-left: 5px;
     background: none;
     border: none;
     color: #6c757d;
@@ -208,13 +209,6 @@ body {
     font-size: 24px;
     margin-bottom: 8px;
     display: block;
-}
-
-.btn-remove-tag {
-    margin-left: 5px;
-    border: none;
-    background: none;
-    cursor: pointer;
 }
 
 input[type="text"] {
@@ -254,7 +248,8 @@ input[type="text"]:focus {
     align-items: center;
 }
 
-.fd-left, .fd-right {
+.fd-left,
+.fd-right {
     flex: 1;
 }
 
@@ -317,7 +312,9 @@ input[type="text"]:focus {
     gap: 0.25rem;
 }
 
-.btn-add-fd, .btn-edit, .btn-remove {
+.btn-add-fd,
+.btn-edit,
+.btn-remove {
     padding: 0.5rem 0.75rem;
     border: none;
     border-radius: 8px;
@@ -384,7 +381,8 @@ input[type="text"]:focus {
     margin-top: 1.5rem;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
     flex: 1;
     padding: 1rem 1.5rem;
     border: none;
@@ -519,7 +517,8 @@ input[type="text"]:focus {
     }
 
     .main-content {
-        grid-template-columns: 1fr; /* single column on tablets/mobiles */
+        grid-template-columns: 1fr;
+        /* single column on tablets/mobiles */
         padding: 1.5rem;
         gap: 1.5rem;
     }
@@ -537,7 +536,8 @@ input[type="text"]:focus {
         padding: 0.75rem;
     }
 
-    .btn-primary, .btn-secondary {
+    .btn-primary,
+    .btn-secondary {
         font-size: 0.9rem;
         padding: 0.75rem 1rem;
     }
@@ -559,7 +559,8 @@ input[type="text"]:focus {
     }
 
     .fd-arrow {
-        display: none; /* hide arrow on very small screens */
+        display: none;
+        /* hide arrow on very small screens */
     }
 
     .stats {

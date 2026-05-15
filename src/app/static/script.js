@@ -5,15 +5,15 @@ let editingIndex = -1; // Track which FD is being edited
 function addFD() {
     const leftInput = document.querySelector('.fd-left');
     const rightInput = document.querySelector('.fd-right');
-    
+
     const left = leftInput.value.trim();
     const right = rightInput.value.trim();
-    
+
     if (!left || !right) {
         showNotification('Please fill both left and right sides of FD', 'error');
         return;
     }
-    
+
     if (editingIndex >= 0) {
         // Update existing FD
         fds[editingIndex] = { left, right };
@@ -26,18 +26,18 @@ function addFD() {
         // Add new FD
         fds.push({ left, right });
     }
-    
+
     renderFDs();
     leftInput.value = '';
     rightInput.value = '';
     updateNormalizeButton();
 }
 
-function addCandidateKey(){
+function addCandidateKey() {
     const keyInput = document.querySelector(".key");
     const keyValue = keyInput.value.trim();
 
-    if(!keyValue){
+    if (!keyValue) {
         showNotification("Please give the candidate keys", 'error');
         return;
     }
@@ -48,7 +48,7 @@ function addCandidateKey(){
     updateNormalizeButton();
 }
 
-function renderKeys(){
+function renderKeys() {
     const container = document.querySelector(".key-container");
 
     container.innerHTML = candidate_keys.map((key, index) => `
@@ -72,18 +72,18 @@ function editFD(index) {
     const leftInput = document.querySelector('.fd-left');
     const rightInput = document.querySelector('.fd-right');
     const addBtn = document.querySelector('.btn-add-fd');
-    
+
     // Set editing state
     editingIndex = index;
     leftInput.value = fd.left;
     rightInput.value = fd.right;
     leftInput.placeholder = 'Edit left side';
     rightInput.placeholder = 'Edit right side';
-    
+
     // Change button to save
     addBtn.innerHTML = '<i class="fas fa-check"></i>';
     addBtn.onclick = addFD;
-    
+
     // Scroll input into view
     leftInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
     leftInput.focus();
@@ -97,7 +97,7 @@ function removeFD(index) {
 
 function renderFDs() {
     const container = document.getElementById('fds-container');
-    
+
     if (fds.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -107,7 +107,7 @@ function renderFDs() {
         `;
         return;
     }
-    
+
     container.innerHTML = fds.map((fd, index) => `
         <div class="fd-item" data-index="${index}">
             <div class="fd-display">
@@ -158,7 +158,7 @@ function showNotification(message, type = 'success') {
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.remove();
     }, 3000);
@@ -198,10 +198,10 @@ async function normalizeDB() {
                 ])
             })
         });
-        
+
         const data = await response.json();
         console.log(data);
-        
+
         if (data.success) {
             showResults(data?.relations, data.summary, data.sql);
             showNotification('Normalization successful!', 'success');
@@ -233,7 +233,7 @@ async function normalizeDB() {
 function showResults(relations, summary, sql) {
     console.log(sql)
     const container = document.getElementById('results-container');
-    
+
     if (!relations || relations.length === 0) {
         container.innerHTML = `
             <div class="empty-state large">
@@ -244,7 +244,7 @@ function showResults(relations, summary, sql) {
         `;
         return;
     }
-    
+
     container.innerHTML = `
         <div class="summary">${summary}</div>
         ${relations.map((relation, index) => `
@@ -258,11 +258,10 @@ function showResults(relations, summary, sql) {
                     <strong>Attributes:</strong> ${Array.isArray(relation.attributes) ? relation.attributes.join(', ') : 'No attributes'}
                 </div>
                 <div class="relation-keys">
-                    <strong>Keys:</strong> ${
-                        Array.isArray(relation.keys) 
-                        ? relation.keys.map(k => `<u>{${k.join(', ')}}</u>`).join(' , ') 
-                        : 'No keys'
-                    }
+                    <strong>Keys:</strong> ${Array.isArray(relation.keys)
+            ? relation.keys.map(k => `<u>{${k.join(', ')}}</u>`).join(' , ')
+            : 'No keys'
+        }
                 </div>
             </div>
         `).join('')}
