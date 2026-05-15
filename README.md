@@ -6,14 +6,14 @@
 
 *normaldb* is a pure-Python package supplying a quadratic-time
 implementation of Bernstein's synthesis algorithm for relational
-schemas in Codd's third normal form (3NF).[^1] The core algorithm
+schemas in Codd's third normal form (3NF)[^1]. The core algorithm
 is implemented as a builder class to enable inspection of the
 outputs of individual steps of the algorithm. The package is
 accompanied by an optional Flask app that takes
 a set of functional dependencies from the user, pipes it through
 the algorithm, and presents the generated schema.
 
-The algorithm implements a linear-time algorithm proposed by
+The algorithm uses as a subroutine a linear-time algorithm proposed by
 Beeri and Bernstein[^2] to check the
 membership of a functional dependency in the closure of a set
 of functional dependencies.
@@ -34,7 +34,7 @@ In the repository root, create a
 pip install .
 ```
 to install the package dependencies, or
-```bash
+```pwsh
 pip install .[gui]
 ```
 to install the package dependencies and the optional dependencies for the
@@ -45,8 +45,6 @@ To launch the app on `localhost`, run
 flask run
 ```
 on the command line.
-
-## References
 
 [^1]: Philip A. Bernstein. “Synthesizing third normal form relations from
       functional dependencies”. In: _ACM Trans. Database Syst._ 1.4 (Dec.
